@@ -27,7 +27,7 @@ IndMaxVal = df['Altitude'].idxmax()
 MaxVal = df["Altitude"].max()
 NumEl = len(df['Altitude'])
 
-scale = 20
+scale = 200
 noise = np.random.normal(0, 1, NumEl) * scale
 
 # plt.plot(noise)
@@ -63,12 +63,12 @@ for i in range(0, (len(df["Time"]) - 20), 1):
                        (rocketTime[t + 1] - rocketTime[t]))
 
     #add components to get current velocity
-    vEstimation = h + a
+    v = h + a
 
 
     newH.append(h)
     newA.append(a)
-    newVel.append(vEstimation)
+    vEstimation.append(v)
 
 plt.plot(df["Velocity"], label="real velocity")
 plt.plot(vEstimation, label="estimated velocity")
