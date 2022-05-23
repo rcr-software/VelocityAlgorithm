@@ -27,7 +27,7 @@ IndMaxVal = df['Altitude'].idxmax()
 MaxVal = df["Altitude"].max()
 NumEl = len(df['Altitude'])
 
-scale = 200
+scale = 10
 noise = np.random.normal(0, 1, NumEl) * scale
 
 # plt.plot(noise)
@@ -38,7 +38,7 @@ NSignal = df["Altitude"] + noise
 # plt.plot(NSignal)
 # plt.hist(NSignal)
 
-N = 20 # number of samples the rocket will read at a time
+N = 10 # number of samples the rocket will read at a time
 
 newH = [0]
 newA = [0]
