@@ -10,7 +10,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-noise = np.random.normal(0, 1, 100)
+# noise = np.random.normal(0, 1, 100)
+
+
 
 # 0 is the mean of the normal distribution you are choosing from
 # 1 is the standard deviation of the normal distribution
@@ -27,12 +29,30 @@ IndMaxVal = df['Altitude'].idxmax()
 MaxVal = df["Altitude"].max()
 NumEl = len(df['Altitude'])
 
-scale = 10
-noise = np.random.normal(0, 1, NumEl) * scale
+"""
+Adding noise to the signal in each dataframe
+"""
+#noise for Altitude
+AltScale = 2
+noiseAlt = np.random.normal(0, 1, NumEl) * AltScale
+
+#noise for Time
+TimeScale = 0.00001
+noiseTime = np.random.normal(0, 1, NumEl) * TimeScale
+
+#noise for Acceleration
+AccScale = 5
+noiseAcc = np.random.normal(0, 1, NumEl) * AccScale
+
+
+df['Altitude']     = noiseAlt + df['Altitude']
+df['Time']         = noiseTime + df['Time']
+df['Acceleration'] = noiseAlt + df['Acceleration']
+
 
 # plt.plot(noise)
 
-NSignal = df["Altitude"] + noise
+# NSignal = df["Altitude"] + noiseAlt
 
 
 # plt.plot(NSignal)
@@ -65,10 +85,12 @@ for i in range(0, (len(df["Time"]) - 20), 1):
     #add components to get current velocity
     v = h + a
 
-
+  
     newH.append(h)
     newA.append(a)
     vEstimation.append(v)
+
+
 
 plt.plot(df["Velocity"], label="real velocity")
 plt.plot(vEstimation, label="estimated velocity")
