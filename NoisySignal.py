@@ -23,7 +23,7 @@ col_list = ["Time", "Altitude", "Velocity", "Acceleration"]
 
 df = pd.read_csv('BV_timealtvelaccel.csv', comment='#', names=col_list)
 # plt.plot(df)
-
+#Comment Alejandro
 
 IndMaxVal = df['Altitude'].idxmax()
 MaxVal = df["Altitude"].max()
