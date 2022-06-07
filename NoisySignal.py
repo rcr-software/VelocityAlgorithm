@@ -100,7 +100,15 @@ for i in range(0, (len(df["Time"]) - 20), 1):
 # fig.write_html("Graph.html")
 # fig.show()
 
+
 fig = go.Figure()
+fig.add_trace(go.Scatter(x=df["TimeAlt"], y=vEstimation,
+                    mode='lines',
+                    name='Estimation'))
+
+
+
+
 fig.add_trace(go.Scatter(x=df["TimeAlt"], y=df["Velocity"],
                     mode='lines',
                     name='Velocity'))
@@ -110,7 +118,7 @@ fig.add_trace(go.Scatter(x=df["TimeAcc"], y=df["Acceleration"],
                     name='lines'))
 fig.add_trace(go.Scatter(x=df["TimeAlt"], y=df["Altitude"],
                     mode='lines',
-                    name='Acceleration'))
+                    name='Altitude'))
 
 
 fig.write_html("Graph.html")
