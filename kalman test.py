@@ -59,8 +59,8 @@ def kalman(encPos, rawState, filteredState):
     """
     We need the initial value of this variables
     """
-    TIME_DIVISOR=1
-    kalman_lastTime=1
+    TIME_DIVISOR    = 0.1
+    kalman_lastTime = 0
        
     
     #    static float x_k[3] = { 0, 0, 0 }
@@ -120,9 +120,18 @@ def kalman(encPos, rawState, filteredState):
     """
     ## Things we are needing
     ####################
-    rocket= "???"
-    ENC_RANGE=1
-    RHO=1
+    rocket.Cd_b
+    rocket.Cd_r
+    rocket.Ar
+    rocket.Ab
+    rocket.dryMass
+    rocket.propMass
+    rocket.avgMotorThrust  
+    rocket    = "???Look in GlobVars and GUI.cpp"
+    
+    
+    ENC_RANGE = 240   ## Globvars.h, Apparently reffered to the drag system
+    RHO       = 1.18  ## Globvars.h
     
     
     #calculate what Kalman thinks the acceleration is
