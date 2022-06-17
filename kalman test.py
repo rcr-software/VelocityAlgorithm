@@ -2,16 +2,32 @@ import math
 import matplotlib
 import numpy as np
 #Kalman variables
-float q_k[3][3] = {                                             #Constants used in Kalman calculations
-  { 1, 0, 0 },
-  { 0, 0.02, 0 },
-  { 0, 0, 0.2 }
-};
-float r_k[3][3] = {
-  { 0.5, 0, 0 },
-  { 0, 4, 0 },
-  { 0, 0, 7 }
-};
+#Constants used in Kalman calculations
+# float q_k[3][3] = {                                             
+#   { 1, 0, 0 },
+#   { 0, 0.02, 0 },
+#   { 0, 0, 0.2 }
+# };
+
+q_k= [                                          
+  [ 1, 0, 0 ],
+  [ 0, 0.02, 0 ],
+  [ 0, 0, 0.2 ]
+]
+
+# float r_k[3][3] = {
+#   { 0.5, 0, 0 },
+#   { 0, 4, 0 },
+#   { 0, 0, 7 }
+# };
+
+r_k= [                                          
+  [ 0.5, 0, 0 ],
+  [ 0, 4, 0 ],
+  [ 0, 0, 7 ]
+]
+
+
 #
 #_  __     _                         ______                _   _
 #| |/ /    | |                       |  ____|              | | (_)
@@ -33,10 +49,22 @@ kalman_lastTime = 0
 #C++ TO PYTHON CONVERTER NOTE: This was formerly a static local variable declaration (not allowed in Python):
 kalman_p_k = [[] for _ in range(3)]
 
+
+
+
+
+
 def kalman(encPos, rawState, filteredState):
+   
+    ### Variables we are needing
+    TIME_DIVISOR=1
+    kalman_lastTime=1
+    
+    
+    
     #    static float x_k[3] = { 0, 0, 0 }
     #    static uint lastTime
-	delta_t = None
+    delta_t = None
     z_k = [0 for _ in range(3)]
     #    static float p_k[3][3] = { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } }
     placeHolder_3_1 = [0 for _ in range(3)]
@@ -69,17 +97,24 @@ def kalman(encPos, rawState, filteredState):
     f_k[0][1] = delta_t
 
 ##if DEBUG_KALMAN
-    Serial.println("KALMAN---------------------")
-    Serial.print("delta_t = ") #temp
-    Serial.println(delta_t) #temp
-    Serial.print("t = ") #temp
-    Serial.println(rawState.time) #temp
-    Matrix.Print(kalman_x_k, 3, 1, "x_k") #temp
-    Matrix.Print(float(f_k), 3, 3, "f_k") #temp
-    Matrix.Print(b_k, 3, 1, "b_k") #temp
-    Matrix.Print(z_k, 3, 1, "z_k") #temp
+
+    print("KALMAN--------------------- \n")
+    print("delta_t = ") #temp
+    print(delta_t) #temp
+    print("t = ") #temp
+    print(rawState.time,"\n") #temp
+    ##Matrix print
+    print(kalman_x_k, 3, 1, "x_k") #temp
+    print(float(f_k), 3, 3, "f_k") #temp
+    print(b_k, 3, 1, "b_k") #temp
+    print(z_k, 3, 1, "z_k") #temp
 ##endif
 
+    ## Things we are needing
+    rocket= "???"
+    ENC_RANGE=1
+    RHO=1
+    
     #calculate what Kalman thinks the acceleration is
     c_d = rocket.Cd_r *(1 - encPos / ENC_RANGE) + encPos *rocket.Cd_b / ENC_RANGE
     area = rocket.Ar*(1 - encPos / ENC_RANGE) + encPos *rocket.Ab / ENC_RANGE
@@ -94,7 +129,8 @@ def kalman(encPos, rawState, filteredState):
         u_k = 0
         #Serial.print("On pad "); //errorlog
         #Serial.println(z_k[0])
-    if math.isnan(u_k)
+    if math.isnan(u_k):
+        
 ##if DEBUG_KALMAN
         Serial.println("u_k is nan!")
 ##endif
@@ -102,15 +138,15 @@ def kalman(encPos, rawState, filteredState):
         u_k = 0
 
 ##if DEBUG_KALMAN
-    Serial.println("")
-    Serial.print("u_k = ")
-    Serial.println(u_k)
-    Serial.print("c_d = ") #temp
-    Serial.println(c_d) #temp
-    Serial.print("area = ") #temp
-    Serial.println(area) #temp
-    Serial.print("q = ") #temp
-    Serial.println(q) #temp
+    print("\n")
+    print("u_k = ")
+    print(u_k,"\n")
+    print("c_d = ") #temp
+    print(c_d,"\n") #temp
+    print("area = ") #temp
+    print(area,"\n") #temp
+    print("q = ") #temp
+    print(q,"\n") #temp
 ##endif
 
     #Predict----------------------------
