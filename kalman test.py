@@ -51,9 +51,14 @@ kalman_p_k = [[] for _ in range(3)]
 
 def kalman(encPos, rawState, filteredState):
    
-    ### Variables we are needing !!!!
+    ### Variables we are needing inside the function!!!!
     kalman_x_k = [0 for _ in range(3)]
+    kalman_p_k = [[] for _ in range(3)]
     
+    ## ?????
+    """
+    We need the initial value of this variables
+    """
     TIME_DIVISOR=1
     kalman_lastTime=1
        
@@ -109,6 +114,10 @@ def kalman(encPos, rawState, filteredState):
     print(z_k, 3, 1, "z_k") #temp
 ##endif
 
+    # ?????
+    """
+    We need the initial value of this variables
+    """
     ## Things we are needing
     ####################
     rocket= "???"
@@ -135,7 +144,9 @@ def kalman(encPos, rawState, filteredState):
 ##if DEBUG_KALMAN
         print("u_k is nan!","\n")
 ##endif
-        DataLog.logError(NAN_UK)
+        # ???? what to do with this log,
+        # Probably just ommit it
+        # DataLog.logError(NAN_UK)
         u_k = 0
 
 ##if DEBUG_KALMAN
@@ -163,42 +174,76 @@ def kalman(encPos, rawState, filteredState):
 
 
 ##if DEBUG_KALMAN
-    Matrix.Print(b_k, 3, 1, "u_k*b_k")
-    Matrix.Print(placeHolder_3_1, 3, 1, "f_k*x_k")
-    Matrix.Print(kalman_x_k, 3, 1, "x_k predict")
+    # Matrix.Print(b_k, 3, 1, "u_k*b_k")    
+    print("u_k*b_k=\n",b_k)
+    
+    # Matrix.Print(placeHolder_3_1, 3, 1, "f_k*x_k")
+    print("f_k*x_k=\n",placeHolder_3_1)
+    
+    # Matrix.Print(kalman_x_k, 3, 1, "x_k predict")
+    print("x_k predict=\n",kalman_x_k)
+    
 ##endif
 
     #p_k = q_k + f_k*p_k*T(f_k)
-    Matrix.Multiply(float(f_k), float(kalman_p_k), 3, 3, 3, float(placeHolder_3_3_1))
-    Matrix.Transpose(float(f_k), 3, 3, float(placeHolder_3_3_2))
-    Matrix.Multiply(float(placeHolder_3_3_1), float(placeHolder_3_3_2), 3, 3, 3, float(placeHolder_3_3_3))
-    Matrix.Add(float(placeHolder_3_3_3), float(q_k), 3, 3, float(kalman_p_k))
+    # Matrix.Multiply(float(f_k), float(kalman_p_k), 3, 3, 3, float(placeHolder_3_3_1))
+    placeHolder_3_3_1 = np.dot(f_k,kalman_p_k)
+    
+    # Matrix.Transpose(float(f_k), 3, 3, float(placeHolder_3_3_2))
+    placeHolder_3_3_2 = np.transpose(f_k)
+    
+    # Matrix.Multiply(float(placeHolder_3_3_1), float(placeHolder_3_3_2), 3, 3, 3, float(placeHolder_3_3_3))
+    placeHolder_3_3_3 = np.dot(placeHolder_3_3_1, placeHolder_3_3_2)
+    
+    # Matrix.Add(float(placeHolder_3_3_3), float(q_k), 3, 3, float(kalman_p_k))
+    kalman_p_k = placeHolder_3_3_3 + q_k
+
 
 ##if DEBUG_KALMAN
-    Matrix.Print(float(kalman_p_k), 3, 3, "p_k predict")
+    # Matrix.Print(float(kalman_p_k), 3, 3, "p_k predict")
+    print("p_k predict=\n",kalman_p_k)
+    
 ##endif
 
     #Kalman Gain------------------------
     #p_k*T(h_k) / (r_k + h_k * p_k * T(h_k)) ==
     #p_k / (r_k + p_k)    ..When h_k = eye(3)
-    Matrix.Add(float(r_k), float(kalman_p_k), 3, 3, float(placeHolder_3_3_1))
-    Matrix.Invert(float(placeHolder_3_3_1), 3)
-    Matrix.Multiply(float(kalman_p_k), float(placeHolder_3_3_1), 3, 3, 3, float(k_gain))
+    
+    # Matrix.Add(float(r_k), float(kalman_p_k), 3, 3, float(placeHolder_3_3_1))
+    placeHolder_3_3_1 = r_k + kalman_p_k
+    
+    # Matrix.Invert(float(placeHolder_3_3_1), 3)
+    np.linalg.inv(placeHolder_3_3_1)
+    
+    # Matrix.Multiply(float(kalman_p_k), float(placeHolder_3_3_1), 3, 3, 3, float(k_gain))
+    k_gain = np.dot(kalman_p_k,placeHolder_3_3_1)
+
 
 ##if DEBUG_KALMAN
-    Matrix.Print(float(k_gain), 3, 3, "kalman gain")
+    # Matrix.Print(float(k_gain), 3, 3, "kalman gain")
+    print( "kalman gain=\n", k_gain)
+    
     #Matrix.Print((float*)placeHolder_3_3_1, 3, 3, "1 / (r_k + p_k)")
 ##endif
 
     #Update-----------------------------
     #x_k = k_gain * (z_k - x_k) + x_k
-    Matrix.Subtract(float(z_k), float(kalman_x_k), 3, 1, float(placeHolder_3_3_1))
-    Matrix.Multiply(float(k_gain), float(placeHolder_3_3_1), 3, 3, 1, float(placeHolder_3_3_2))
-    Matrix.Add(float(kalman_x_k), float(placeHolder_3_3_2), 3, 1, kalman_x_k)
+    # Matrix.Subtract(float(z_k), float(kalman_x_k), 3, 1, float(placeHolder_3_3_1))
+    placeHolder_3_3_1=z_k - kalman_x_k
+    
+    # Matrix.Multiply(float(k_gain), float(placeHolder_3_3_1), 3, 3, 1, float(placeHolder_3_3_2))
+    placeHolder_3_3_2 = np.dot(k_gain,placeHolder_3_3_1)
+    
+    # Matrix.Add(float(kalman_x_k), float(placeHolder_3_3_2), 3, 1, kalman_x_k)
+    kalman_x_k = kalman_x_k + placeHolder_3_3_2
+
 
     #p_k = p_k - k_gain * p_k
-    Matrix.Multiply(float(k_gain), float(kalman_p_k), 3, 3, 1, float(placeHolder_3_3_1))
-    Matrix.Subtract(float(kalman_p_k), float(placeHolder_3_3_1), 3, 1, float(kalman_p_k))
+    # Matrix.Multiply(float(k_gain), float(kalman_p_k), 3, 3, 1, float(placeHolder_3_3_1))
+    placeHolder_3_3_1=np.dot(k_gain,kalman_p_k)
+    
+    # Matrix.Subtract(float(kalman_p_k), float(placeHolder_3_3_1), 3, 1, float(kalman_p_k))
+    kalman_p_k = kalman_p_k - placeHolder_3_3_1
 
     filteredState.alt = kalman_x_k[0]
     filteredState.vel = kalman_x_k[1]
