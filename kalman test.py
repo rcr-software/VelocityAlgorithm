@@ -49,18 +49,14 @@ kalman_lastTime = 0
 #C++ TO PYTHON CONVERTER NOTE: This was formerly a static local variable declaration (not allowed in Python):
 kalman_p_k = [[] for _ in range(3)]
 
-
-
-
-
-
 def kalman(encPos, rawState, filteredState):
    
-    ### Variables we are needing
+    ### Variables we are needing !!!!
+    kalman_x_k = [0 for _ in range(3)]
+    
     TIME_DIVISOR=1
     kalman_lastTime=1
-    
-    
+       
     
     #    static float x_k[3] = { 0, 0, 0 }
     #    static uint lastTime
@@ -77,6 +73,9 @@ def kalman(encPos, rawState, filteredState):
     q = None
     b_k = [0 for _ in range(3)]
     f_k = [[1, 0, 0], [0, 1, 0], [0, 0, 0]]
+    #Convert to numpy matrices
+    b_k=np.array(b_k)
+    f_k=np.array(f_k)
 
     #x_k[0] = filteredState->alt
     #x_k[1] = filteredState->vel
@@ -111,9 +110,11 @@ def kalman(encPos, rawState, filteredState):
 ##endif
 
     ## Things we are needing
+    ####################
     rocket= "???"
     ENC_RANGE=1
     RHO=1
+    
     
     #calculate what Kalman thinks the acceleration is
     c_d = rocket.Cd_r *(1 - encPos / ENC_RANGE) + encPos *rocket.Cd_b / ENC_RANGE
@@ -132,7 +133,7 @@ def kalman(encPos, rawState, filteredState):
     if math.isnan(u_k):
         
 ##if DEBUG_KALMAN
-        Serial.println("u_k is nan!")
+        print("u_k is nan!","\n")
 ##endif
         DataLog.logError(NAN_UK)
         u_k = 0
@@ -151,9 +152,15 @@ def kalman(encPos, rawState, filteredState):
 
     #Predict----------------------------
     #x_k = u_k*b_k + f_k*x_k
-    Matrix.Scale(float(b_k), 3, 1, u_k)
-    Matrix.Multiply(float(f_k), float(kalman_x_k), 3, 3, 1, float(placeHolder_3_1))
-    Matrix.Add(float(b_k), float(placeHolder_3_1), 3, 1, float(kalman_x_k))
+    # Matrix.Scale(float(b_k), 3, 1, u_k)
+    b_k = b_k*u_k
+    
+    # Matrix.Multiply(float(f_k), float(kalman_x_k), 3, 3, 1, float(placeHolder_3_1))
+    placeHolder_3_1 = np.dot(f_k , kalman_x_k)
+    
+    # Matrix.Add(float(b_k), float(placeHolder_3_1), 3, 1, float(kalman_x_k))
+    kalman_x_k = b_k+placeHolder_3_1
+
 
 ##if DEBUG_KALMAN
     Matrix.Print(b_k, 3, 1, "u_k*b_k")
